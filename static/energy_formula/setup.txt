@@ -1,0 +1,5 @@
+plugin.tx_formulae_pi1 {
+	storagePid = 45
+	errorClassName = error
+	saveHidden = 1
+}

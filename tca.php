@@ -51,8 +51,8 @@ $TCA['tx_formulae_formulas'] = array (
 			'config' => array (
 				'type' => 'radio',
 				'items' => array (
-					array('LLL:EXT:formulae/locallang_db.xml:tx_formulae_formulas.title.I.0', '1'),
-					array('LLL:EXT:formulae/locallang_db.xml:tx_formulae_formulas.title.I.1', '2'),
+					array('LLL:EXT:formulae/locallang_db.xml:tx_formulae_formulas.title.I.0', '0'),
+					array('LLL:EXT:formulae/locallang_db.xml:tx_formulae_formulas.title.I.1', '1'),
 				),
 			)
 		),
