@@ -5,7 +5,9 @@ if (!defined('TYPO3_MODE')) {
 $TCA['tx_formulae_formulas'] = array (
 	'ctrl' => array (
 		'title'     => 'LLL:EXT:formulae/locallang_db.xml:tx_formulae_formulas',		
-		'label'     => 'uid',	
+		'label'     => 'formula',
+		'label_alt' => 'firstname,lastname',
+		'label_alt_force' => 1,
 		'tstamp'    => 'tstamp',
 		'crdate'    => 'crdate',
 		'cruser_id' => 'cruser_id',

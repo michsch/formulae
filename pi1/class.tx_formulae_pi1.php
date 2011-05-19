@@ -54,7 +54,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 * @param	array		$conf: The PlugIn configuration
 	 * @return	The content that is displayed on the website
 	 */
-	function main($content, $conf) {
+	public function main($content, $conf) {
 		$this->init($conf);
 
 		switch($this->view) {
@@ -156,7 +156,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 */
 	protected function createAction() {
 		if ($this->validateForm() == true) {
-			$date = new DateTime();
+			//$date = new DateTime();
 
 			if (! isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 				$client_ip = $_SERVER['REMOTE_ADDR'];
@@ -174,12 +174,16 @@ class tx_formulae_pi1 extends tslib_pibase {
 			$saveData['hidden'] = $this->conf['saveHidden'];
 			$saveData['votes'] = 1;
 			$saveData['finalvotes'] = 1;
-			$saveData['tstamp'] = $date->getTimestamp();
-			$saveData['crdate'] = $date->getTimestamp();
+			$saveData['tstamp'] = time();
+			$saveData['crdate'] = time();
 			$saveData['ipaddress'] = $client_ip;
 			$insert = $GLOBALS['TYPO3_DB']->exec_INSERTquery($this->formulasTable, $saveData);
 			
-			return $this->showThanks4Entry();
+			if ($this->conf['createRedirect']) {
+				t3lib_utility_Http::redirect('index.php?id='.$this->conf['createRedirect']);
+			} else {
+				return $this->showThanks4Entry();
+			}
 		} else {
 			return $this->showForm($errors = true);
 		}
@@ -215,11 +219,15 @@ class tx_formulae_pi1 extends tslib_pibase {
 				'votes' => $votes+1
 			);
 			$update = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->formulasTable,'uid='.$uid,$fields);
-		} else {
-			//return "no Vote";
+			
+			if ($this->conf['voteRedirect']) {
+				t3lib_utility_Http::redirect('index.php?id='.$this->conf['voteRedirect']);
+			} else {
+				return $this->showThanks4Vote();
+			}
+		} else if ($this->checkCookie() || $this->writeCookie($uid) == false) {	
+			return $this->showNextVote();
 		}
-		
-		return $this->showThanks4Vote();
 	}
 
 	/**
@@ -231,13 +239,13 @@ class tx_formulae_pi1 extends tslib_pibase {
 	private function showForm($errors = false) {	
 		$this->errors = ($errors) ? true : false;
 		
-		$form = '<form action="" method="post" class="yform">';
+		$form = '<form action="index.php?id='.$GLOBALS["TSFE"]->id.'" method="post" class="yform">';
 		$form .= '<fieldset>';
 
 		// adding formula
 		$form .= '
 			<div class="'.$this->isError('formula').'">
-				<textarea id="formula" name="formula" cols="30" rows="7">'.$this->isValue('formula').'</textarea>
+				<textarea id="formula" name="formula" cols="30" rows="3">'.$this->isValue('formula').'</textarea>
 			</div>';
 		
 		// adding contact informations
@@ -276,9 +284,19 @@ class tx_formulae_pi1 extends tslib_pibase {
 				<label for="email">E-Mail *</label>
 				<input id="email" name="email" type="text" value="'.$this->isValue('email').'" />
 			</div>
-			<div class="type-check '.$this->isError('gtc').'">
-				<span>AGB *</span>
-				<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/> <label for="gtc">AGB akzeptieren</label>
+			<div class="type-check multiple-check '.$this->isError('gtc').'">
+				<span>Datenschutz</span>
+				<div class="check">
+					<p>Bitte füllen Sie dieses Formular aus und nehmen Sie am Energie-Formel-Voting
+					teil. Ihre persönlichen Daten werden ausschließlich für die Teilnahme am
+					Energie-Formel-Voting erhoben und für die Benachrichtigung des Gewinners
+					benutzt. Die Daten werden weder für Werbezwecke genutzt, noch erfolgt eine
+					Weitergabe an Dritte. Die gesetzlichen Vorschriften im Zusammenhang mit
+					Datenschutz werden eingehalten.<br />
+					Unter den Teilnehmern entscheidet das Los. Der Rechtsweg ist ausgeschlossen.
+					Eine Barauszahlung des Gewinns ist nicht möglich.</p>
+				</div>
+				<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/> <label for="gtc">* Ich stimme den Datenschutzbestimmungen zu.</label>
 			</div>
 		';
 		$form .= '</fieldset>';
@@ -286,7 +304,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 		// adding submit button
 		$form .= '
 			<div class="type-button">
-				<p>Alle Felder mit einem * sind Pflichtfelder</p>
+				<p>Alle Felder mit einem * sind Pflichtfelder.</p>
 				<input type="submit" class="submit" value="absenden"/>
 			</div>';
 		$form .= '</form>';
@@ -352,12 +370,28 @@ class tx_formulae_pi1 extends tslib_pibase {
 	}
 
 	/**
+	 * Shows time to next vote
+	 *
+	 * @param string cookie expire time
+	 * @return string HTML message
+	 */
+	private function showNextVote() {
+		$cookie = unserialize(stripslashes($_COOKIE[$this->cookieName]));
+		$seconds = $cookie['expires'] - time();
+		$hours = $seconds / 3600;
+		$content = '<p>Ihre Stimme wurde heute bereits gezählt.
+			Sie dürfen in '. floor($hours) .' Stunden wieder voten.</p>';
+		return $content;
+	}
+
+	/**
 	 * Gets all formulas as an array
 	 *
 	 * @return array all formulas
 	 */
 	private function getFormulas() {
-		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,formula,firstname,lastname,tstamp,crdate', $this->formulasTable, 'hidden=0 AND deleted=0 AND gtc=1', '', 'crdate DESC');
+		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,formula,firstname,lastname,tstamp,crdate',
+			$this->formulasTable, 'hidden=0 AND deleted=0 AND gtc=1', '', 'crdate DESC');
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
 			$formulas[] = $row;
 		}
@@ -384,7 +418,11 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 * @return boolean true if cookie is written
 	 */
 	private function writeCookie($uid) {
-		return setcookie($this->cookieName, $uid, time()+60*60*24*30);
+		$data = array(
+			'expires' => time()+60*60*24, // 24 hours
+			'uid' => $uid
+		);
+		return setcookie($this->cookieName, serialize($data), $data['expires']);
 	}
 
 	/**

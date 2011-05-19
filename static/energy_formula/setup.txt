@@ -3,4 +3,7 @@ plugin.tx_formulae_pi1 {
 	errorClassName = error
 	saveHidden = 1
 	listPid = 48
+
+  createRedirect = 
+	voteRedirect =
 }
