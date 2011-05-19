@@ -44,6 +44,8 @@ class tx_formulae_pi1 extends tslib_pibase {
 	var $pi_checkCHash = true;
 	
 	var $formulasTable = 'tx_formulae_formulas';
+	
+	var $cookieName = 'energieformulavote';
 
 	/**
 	 * The main method of the PlugIn
@@ -162,6 +164,10 @@ class tx_formulae_pi1 extends tslib_pibase {
 			else {
 				$client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 			}
+			
+			foreach ($this->postvars as $key => $value) {
+				$this->postvars[$key] = htmlspecialchars($value);
+			}
 
 			$saveData = $this->postvars;
 			$saveData['pid'] = $this->conf['storagePid'];
@@ -172,6 +178,8 @@ class tx_formulae_pi1 extends tslib_pibase {
 			$saveData['crdate'] = $date->getTimestamp();
 			$saveData['ipaddress'] = $client_ip;
 			$insert = $GLOBALS['TYPO3_DB']->exec_INSERTquery($this->formulasTable, $saveData);
+			
+			return $this->showThanks4Entry();
 		} else {
 			return $this->showForm($errors = true);
 		}
@@ -194,8 +202,9 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 * @return string HTML output for the frontend
 	 */
 	protected function voteAction() {
-		if ($this->checkCookie() == false) {
-			$uid = $this->getvars['formula-uid'];
+		$uid = $this->getvars['formula-uid'];
+
+		if ($this->checkCookie() == false && $this->writeCookie($uid) == true) {
 			
 			$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('votes', $this->formulasTable, 'uid='.$uid, '', '');
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
@@ -207,7 +216,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 			);
 			$update = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->formulasTable,'uid='.$uid,$fields);
 		} else {
-			// no voting
+			//return "no Vote";
 		}
 		
 		return $this->showThanks4Vote();
@@ -222,33 +231,33 @@ class tx_formulae_pi1 extends tslib_pibase {
 	private function showForm($errors = false) {	
 		$this->errors = ($errors) ? true : false;
 		
-		$form = '<form action="" method="post" class="yform columnar">';
+		$form = '<form action="" method="post" class="yform">';
 		$form .= '<fieldset>';
 
 		// adding formula
 		$form .= '
-			<div class="type-text '.$this->isError('formula').'">
-				<label for="formula">Energie-Formel</label>
+			<div class="'.$this->isError('formula').'">
 				<textarea id="formula" name="formula" cols="30" rows="7">'.$this->isValue('formula').'</textarea>
-			</div>
-		</fieldset>';
+			</div>';
 		
 		// adding contact informations
-		$form .= '<fieldset>';
+		$form .= '<fieldset class="columnar">';
 		$form .= '
-			<div class="type-check '.$this->isError('title').'">
-				<p>Anrede</p>
-				<input type="radio" id="title-1" name="title" value="0" '.$this->isChecked('title', 0).'/>
-				<label for="title-1">Herr</label>
-				<input type="radio" id="title-2" name="title" value="1" '.$this->isChecked('title', 1).'/>
-				<label for="title-2">Frau</label>
+			<div class="type-check multiple-check '.$this->isError('title').'">
+				<span>Anrede *</span>
+				<div class="check">
+					<label for="title-1">Herr</label>
+					<input type="radio" id="title-1" name="title" value="0" '.$this->isChecked('title', 0).'/>
+					<label for="title-2">Frau</label>
+					<input type="radio" id="title-2" name="title" value="1" '.$this->isChecked('title', 1).'/>
+				</div>
 			</div>
 			<div class="type-text '.$this->isError('firstname').'">
-				<label for="firstname">Vorname</label>
+				<label for="firstname">Vorname *</label>
 				<input id="firstname" name="firstname" type="text" value="'.$this->isValue('firstname').'" />
 			</div>
 			<div class="type-text '.$this->isError('lastname').'">
-				<label for="lastname">Nachname</label>
+				<label for="lastname">Nachname *</label>
 				<input id="lastname" name="lastname" type="text" value="'.$this->isValue('lastname').'" />
 			</div>
 			<div class="type-text '.$this->isError('company').'">
@@ -256,20 +265,20 @@ class tx_formulae_pi1 extends tslib_pibase {
 				<input id="company" name="company" type="text" value="'.$this->isValue('company').'" />
 			</div>
 			<div class="type-text '.$this->isError('street').'">
-				<label for="street">Strasse</label>
+				<label for="street">Straße/Nr. *</label>
 				<input id="street" name="street" type="text" value="'.$this->isValue('street').'" />
 			</div>
 			<div class="type-text '.$this->isError('city').'">
-				<label for="city">Stadt</label>
+				<label for="city">PLZ/Ort *</label>
 				<input id="city" name="city" type="text" value="'.$this->isValue('city').'" />
 			</div>
 			<div class="type-text '.$this->isError('email').'">
-				<label for="email">E-Mail</label>
+				<label for="email">E-Mail *</label>
 				<input id="email" name="email" type="text" value="'.$this->isValue('email').'" />
 			</div>
 			<div class="type-check '.$this->isError('gtc').'">
-				<label for="gtc">AGB</label>
-				<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/>
+				<span>AGB *</span>
+				<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/> <label for="gtc">AGB akzeptieren</label>
 			</div>
 		';
 		$form .= '</fieldset>';
@@ -277,6 +286,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 		// adding submit button
 		$form .= '
 			<div class="type-button">
+				<p>Alle Felder mit einem * sind Pflichtfelder</p>
 				<input type="submit" class="submit" value="absenden"/>
 			</div>';
 		$form .= '</form>';
@@ -294,18 +304,35 @@ class tx_formulae_pi1 extends tslib_pibase {
 		$list = '<div class="formulae-list">';
 		
 		foreach ($formulas as $formula) {
+			$lastname = substr($formula['lastname'],0,1).'.';
 			$urlParameters=array(
 				'action' => 'vote',
 				'formula-uid' => $formula['uid']
 			);
-			$list .= '<div class="formula">
-				<p>'.$formula['formula'].'</p>'
+			$list .= '<div class="formula"><div class="inner">
+				<p class="text">'.$formula['formula'].'</p>
+				<p class="name">'.$formula['firstname'].' '.$lastname.'</p>'
 				.$this->pi_linkTP('Voten',$urlParameters,0,$GLOBALS["TSFE"]->id)
-				.'</div>';
+				.'</div></div>';
 		}
 		$list .= '</div>';
 		
 		return $list;
+	}
+	
+	/**
+	 * Shows the "thank you" message after adding a formula.
+	 *
+	 * @return string HTML thank you message
+	 */
+	private function showThanks4Entry() {
+		$thanku = '
+			<h2>Vielen Dank</h2>
+			<p>Sie haben Ihre Energie-Formel erfolgreich eingetragen.</p>
+			<p>Wir werden diese zunächst prüfen und schnellst möglich zur Wahl stellen.</p>
+			<p class="button">'.$this->pi_linkToPage('zu den Energie-Formeln',$this->conf['listPid'],$urlParameters=array()).'</p>
+		';
+		return $thanku;
 	}
 	
 	/**
@@ -314,7 +341,14 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 * @return string HTML thank you message
 	 */
 	private function showThanks4Vote() {
-		return "Vielen Dank für die Stimme";
+		$thanku = '
+			<h1>Energie-Formel</h1>
+			<p>Vielen Dank für Ihre Stimme, Ihr Favorit ist gezählt!</p>
+			<p class="button">'.$this->pi_linkToPage('zurück',$this->conf['listPid'],$urlParameters=array()).'</p>
+			<p>Machen Sie mit, nennen Sie uns Ihre persönliche Energie-Formel und sichern Sie sich Ihre
+			Chance auf einen Gewinn</p>
+		';
+		return $thanku;
 	}
 
 	/**
@@ -323,7 +357,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 * @return array all formulas
 	 */
 	private function getFormulas() {
-		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,formula,firstname,lastname,tstamp,crdate', $this->formulasTable, 'hidden=0 AND deleted=0 AND gtc=1', '', 'crdate');
+		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,formula,firstname,lastname,tstamp,crdate', $this->formulasTable, 'hidden=0 AND deleted=0 AND gtc=1', '', 'crdate DESC');
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
 			$formulas[] = $row;
 		}
@@ -337,7 +371,20 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 * @return boolean true if cookie is set and false if not
 	 */
 	private function checkCookie() {
-		return false;
+		if (isset($_COOKIE[$this->cookieName])) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	/**
+	 * Sets a cookie so only one vote per month is possible
+	 *
+	 * @return boolean true if cookie is written
+	 */
+	private function writeCookie($uid) {
+		return setcookie($this->cookieName, $uid, time()+60*60*24*30);
 	}
 
 	/**
