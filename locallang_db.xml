@@ -36,7 +36,7 @@
 			<label index="tx_formulae_formulas.street">Straße/Nr.</label>
 			<label index="tx_formulae_formulas.city">PLZ/Ort</label>
 			<label index="tx_formulae_formulas.email">E-Mail</label>
-			<label index="tx_formulae_formulas.gtc">AGB</label>
+			<label index="tx_formulae_formulas.gtc">Datenschutzbestimmungen</label>
 			<label index="tx_formulae_formulas.votes">Votes</label>
 			<label index="tx_formulae_formulas.finalvotes">finale Votes</label>
 			<label index="tx_formulae_formulas.ipaddress">IP</label>

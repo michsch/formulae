@@ -214,7 +214,6 @@ class tx_formulae_pi1 extends tslib_pibase {
 			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
 				$votes = $row['votes'];
 			}
-			echo $votes;
 			$fields = array(
 				'votes' => $votes+1
 			);
@@ -284,18 +283,19 @@ class tx_formulae_pi1 extends tslib_pibase {
 				<label for="email">E-Mail *</label>
 				<input id="email" name="email" type="text" value="'.$this->isValue('email').'" />
 			</div>
-			<div class="type-check multiple-check '.$this->isError('gtc').'">
-				<span>Datenschutz</span>
-				<div class="check">
-					<p>Bitte füllen Sie dieses Formular aus und nehmen Sie am Energie-Formel-Voting
-					teil. Ihre persönlichen Daten werden ausschließlich für die Teilnahme am
-					Energie-Formel-Voting erhoben und für die Benachrichtigung des Gewinners
-					benutzt. Die Daten werden weder für Werbezwecke genutzt, noch erfolgt eine
-					Weitergabe an Dritte. Die gesetzlichen Vorschriften im Zusammenhang mit
-					Datenschutz werden eingehalten.<br />
-					Unter den Teilnehmern entscheidet das Los. Der Rechtsweg ist ausgeschlossen.
-					Eine Barauszahlung des Gewinns ist nicht möglich.</p>
-				</div>
+			<div class="type-check check-left '.$this->isError('gtc').'">
+				<p><strong>Datenschutzbestimmungen</strong></p>
+				<p class="small">Der Anbieter weist ausdrücklich darauf hin, dass die Datenübertragung im Internet
+				(z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen und nicht lückenlos
+				vor dem Zugriff durch Dritte geschützt werden kann. Ihre persönlichen Daten werden ausschließlich für die
+				Teilnahme am Energie-Formel-Voting erhoben und für die Benachrichtigung des Gewinners
+				benutzt.<br />
+				Die Daten werden weder für Werbezwecke genutzt, noch erfolgt eine
+				Weitergabe an Dritte. Ihre Einwilligung zu dieser Speicherung können Sie jederzeit für die Zukunft
+				widerrufen, so dass Ihre vollständigen Daten bei uns gelöscht werden. Bitte wenden Sie sich dafür an
+				info@ich-bin-die-energie.de.<br />
+				Unter den Teilnehmern entscheidet das Los. Der Rechtsweg ist ausgeschlossen.
+				Eine Barauszahlung des Gewinns ist nicht möglich.</p>
 				<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/> <label for="gtc">* Ich stimme den Datenschutzbestimmungen zu.</label>
 			</div>
 		';
@@ -305,7 +305,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 		$form .= '
 			<div class="type-button">
 				<p>Alle Felder mit einem * sind Pflichtfelder.</p>
-				<input type="submit" class="submit" value="absenden"/>
+				<input type="submit" class="submit" value="Energie-Formel eintragen"/>
 			</div>';
 		$form .= '</form>';
 			
@@ -380,7 +380,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 		$seconds = $cookie['expires'] - time();
 		$hours = $seconds / 3600;
 		$content = '<p>Ihre Stimme wurde heute bereits gezählt.
-			Sie dürfen in '. floor($hours) .' Stunden wieder voten.</p>';
+			Sie dürfen in '. ceil($hours) .' Stunden wieder voten.</p>';
 		return $content;
 	}
 
