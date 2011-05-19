@@ -1,0 +1,34 @@
+<T3DataStructure>
+	<sheets>
+		<sDEF>
+			<ROOT>
+				<TCEforms>
+				<sheetTitle>LLL:EXT:formulae/locallang.xml:pi1_title</sheetTitle>
+				</TCEforms>
+				<type>array</type>
+				<el>
+					<view>
+						<TCEforms>
+							<label>LLL:EXT:formulae/locallang.xml:pi1_view</label>
+							<config>
+								<type>select</type>
+								<items type="array">
+									<numIndex index="0" type="array">
+										<numIndex index="0">LIST</numIndex>
+										<numIndex index="1">list</numIndex>
+									</numIndex>
+									<numIndex index="1" type="array">
+										<numIndex index="0">FORM</numIndex>
+										<numIndex index="1">new</numIndex>
+									</numIndex>
+								</items>	
+								<maxitems>1</maxitems>
+								<size>1</size>
+							</config>
+						</TCEforms>
+					</view>
+	    	</el>
+	  	</ROOT>
+    </sDEF>
+  </sheets>
+</T3DataStructure>

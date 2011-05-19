@@ -20,7 +20,7 @@ CREATE TABLE tx_formulae_formulas (
 	gtc tinyint(3) DEFAULT '0' NOT NULL,
 	votes tinytext,
 	finalvotes tinytext,
-	
+	ipaddress tinytext,
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );

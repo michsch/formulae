@@ -6,20 +6,14 @@
 	</meta>
 	<data type="array">
 		<languageKey index="default" type="array">
-			<label index="pi1_title">Energy Formula Entry</label>
-			<label index="pi1_plus_wiz_description">Energy Formula Entry</label>
-			<label index="pi2_title">Energy Formula List</label>
-			<label index="pi2_plus_wiz_description">Energy Formula List</label>
-			<label index="pi3_title">Energy Formula Final</label>
-			<label index="pi3_plus_wiz_description">Energy Formula Final</label>
+			<label index="pi1_title">Energy Formula</label>
+			<label index="pi1_view">What to display</label>
+			<label index="pi1_plus_wiz_description">Energy Formula</label>
 		</languageKey>
 		<languageKey index="de" type="array">
-			<label index="pi1_title">Energie Formel Eintrag</label>
+			<label index="pi1_title">Energie Formel</label>
+			<label index="pi1_view">Ansicht</label>
 			<label index="pi1_plus_wiz_description">Energie Formel Eintrag</label>
-			<label index="pi2_title">Energie Formel Liste</label>
-			<label index="pi2_plus_wiz_description">Energie Formel Liste</label>
-			<label index="pi3_title">Energy Formula Finale</label>
-			<label index="pi3_plus_wiz_description">Energy Formula Finale</label>
 		</languageKey>
 	</data>
 </T3locallang>

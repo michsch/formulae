@@ -111,9 +111,16 @@ $TCA['tx_formulae_formulas'] = array (
 				'type' => 'none',
 			)
 		),
+		'ipaddress' => array (		
+			'exclude' => 0,		
+			'label' => 'LLL:EXT:formulae/locallang_db.xml:tx_formulae_formulas.ipaddress',		
+			'config' => array (
+				'type' => 'none',
+			)
+		),
 	),
 	'types' => array (
-		'0' => array('showitem' => 'hidden;;1;;1-1-1, formula, firstname, lastname, title;;;;2-2-2, company;;;;3-3-3, street, city, email, gtc, votes, finalvotes')
+		'0' => array('showitem' => 'hidden;;1;;1-1-1, formula, firstname, lastname, title;;;;2-2-2, company;;;;3-3-3, street, city, email, gtc, votes, finalvotes, ipaddress')
 	),
 	'palettes' => array (
 		'1' => array('showitem' => '')

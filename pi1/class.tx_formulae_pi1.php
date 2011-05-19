@@ -54,7 +54,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 */
 	function main($content, $conf) {
 		$this->init($conf);
-	
+
 		switch($this->view) {
 			case 'new':
 				$content = $this->newAction();
@@ -62,8 +62,14 @@ class tx_formulae_pi1 extends tslib_pibase {
 			case 'create':
 				$content = $this->createAction();
 				break;
+			case 'list':
+				$content = $this->listAction();
+				break;
+			case 'vote':
+				$content = $this->voteAction();
+				break;
 			default:
-				$content = $this->newAction();
+				$content = $this->listAction();
 				break;
 		}
 	
@@ -78,8 +84,11 @@ class tx_formulae_pi1 extends tslib_pibase {
 	 */
 	private function init($conf) {
 		$this->conf = $conf;
-		$this->pi_setPiVarDefaults();
+		$this->pi_setPiVarDefaults(); // Set default piVars from TS
+		$this->pi_initPIflexForm(); // Init FlexForm configuration for plugin
 		$this->pi_loadLL();
+
+		$this->view = $this->pi_getFFvalue($this->cObj->data['pi_flexform'], 'view', 'sDEF');
 
 		$this->local_cObj = t3lib_div::makeInstance('tslib_cObj'); // Local cObj.
 		
@@ -124,11 +133,9 @@ class tx_formulae_pi1 extends tslib_pibase {
 		// define view
 		if (is_array($this->postvars) && count($this->postvars) > 0) {
 			$this->view = 'create';
-		} else {
-			$this->view = 'new';
+		} else if ($this->getvars['action'] == vote && $this->getvars['formula-uid']) {
+			$this->view = 'vote';
 		}
-		
-		print_r($this->postvars);
 	}
 
 	/**
@@ -148,6 +155,14 @@ class tx_formulae_pi1 extends tslib_pibase {
 	protected function createAction() {
 		if ($this->validateForm() == true) {
 			$date = new DateTime();
+
+			if (! isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+				$client_ip = $_SERVER['REMOTE_ADDR'];
+			}
+			else {
+				$client_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			}
+
 			$saveData = $this->postvars;
 			$saveData['pid'] = $this->conf['storagePid'];
 			$saveData['hidden'] = $this->conf['saveHidden'];
@@ -155,13 +170,48 @@ class tx_formulae_pi1 extends tslib_pibase {
 			$saveData['finalvotes'] = 1;
 			$saveData['tstamp'] = $date->getTimestamp();
 			$saveData['crdate'] = $date->getTimestamp();
+			$saveData['ipaddress'] = $client_ip;
 			$insert = $GLOBALS['TYPO3_DB']->exec_INSERTquery($this->formulasTable, $saveData);
 		} else {
 			return $this->showForm($errors = true);
 		}
 	}
 	
+	/**
+	 * Shows all Formulas
+	 *
+	 * @return string HTML output for frontend
+	 */
+	protected function listAction() {
+		$formulas = $this->getFormulas();
+		$content = $this->showList($formulas);
+		return $content;
+	}
 	
+	/**
+	 * Check and do voting
+	 *
+	 * @return string HTML output for the frontend
+	 */
+	protected function voteAction() {
+		if ($this->checkCookie() == false) {
+			$uid = $this->getvars['formula-uid'];
+			
+			$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('votes', $this->formulasTable, 'uid='.$uid, '', '');
+			while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+				$votes = $row['votes'];
+			}
+			echo $votes;
+			$fields = array(
+				'votes' => $votes+1
+			);
+			$update = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->formulasTable,'uid='.$uid,$fields);
+		} else {
+			// no voting
+		}
+		
+		return $this->showThanks4Vote();
+	}
 
 	/**
 	 * Shows the form
@@ -232,6 +282,62 @@ class tx_formulae_pi1 extends tslib_pibase {
 		$form .= '</form>';
 			
 		return $form;
+	}
+	
+	/**
+	 * Creates the list view with links for voting
+	 *
+	 * @param array all formulas to display
+	 * @return string HTML with list view
+	 */
+	private function showList($formulas = array()) {
+		$list = '<div class="formulae-list">';
+		
+		foreach ($formulas as $formula) {
+			$urlParameters=array(
+				'action' => 'vote',
+				'formula-uid' => $formula['uid']
+			);
+			$list .= '<div class="formula">
+				<p>'.$formula['formula'].'</p>'
+				.$this->pi_linkTP('Voten',$urlParameters,0,$GLOBALS["TSFE"]->id)
+				.'</div>';
+		}
+		$list .= '</div>';
+		
+		return $list;
+	}
+	
+	/**
+	 * Shows the "thank you" message after voting
+	 *
+	 * @return string HTML thank you message
+	 */
+	private function showThanks4Vote() {
+		return "Vielen Dank für die Stimme";
+	}
+
+	/**
+	 * Gets all formulas as an array
+	 *
+	 * @return array all formulas
+	 */
+	private function getFormulas() {
+		$result = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid,formula,firstname,lastname,tstamp,crdate', $this->formulasTable, 'hidden=0 AND deleted=0 AND gtc=1', '', 'crdate');
+		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result)) {
+			$formulas[] = $row;
+		}
+		
+		return $formulas;
+	}
+	
+	/**
+	 * Checks if a cookie is set
+	 *
+	 * @return boolean true if cookie is set and false if not
+	 */
+	private function checkCookie() {
+		return false;
 	}
 
 	/**

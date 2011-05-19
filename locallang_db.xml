@@ -20,9 +20,9 @@
 			<label index="tx_formulae_formulas.gtc">GTC</label>
 			<label index="tx_formulae_formulas.votes">Votes</label>
 			<label index="tx_formulae_formulas.finalvotes">Final Votes</label>
-			<label index="tt_content.list_type_pi1">Energy Formula Entry</label>
-			<label index="tt_content.list_type_pi2">Energy Formula List</label>
-			<label index="tt_content.list_type_pi3">Energy Formula Final</label>
+			<label index="tx_formulae_formulas.ipaddress">IP</label>
+			<label index="tx_formulae_formulas.submit">submit</label>
+			<label index="tt_content.list_type_pi1">Energy Formula</label>
 		</languageKey>
 		<languageKey index="de" type="array">
 			<label index="tx_formulae_formulas">Energie Formel</label>
@@ -33,15 +33,15 @@
 			<label index="tx_formulae_formulas.title.I.1">Frau</label>
 			<label index="tx_formulae_formulas.title">Anrede</label>
 			<label index="tx_formulae_formulas.company">Firma</label>
-			<label index="tx_formulae_formulas.street">Strasse</label>
-			<label index="tx_formulae_formulas.city">Stadt</label>
+			<label index="tx_formulae_formulas.street">Straße/Nr.</label>
+			<label index="tx_formulae_formulas.city">PLZ/Ort</label>
 			<label index="tx_formulae_formulas.email">E-Mail</label>
 			<label index="tx_formulae_formulas.gtc">AGB</label>
 			<label index="tx_formulae_formulas.votes">Votes</label>
 			<label index="tx_formulae_formulas.finalvotes">finale Votes</label>
-			<label index="tt_content.list_type_pi1">Energie Formel Eintrag</label>
-			<label index="tt_content.list_type_pi2">Energie Formel Liste</label>
-			<label index="tt_content.list_type_pi3">Energy Formula Finale</label>
+			<label index="tx_formulae_formulas.ipaddress">IP</label>
+			<label index="tx_formulae_formulas.submit">Absenden</label>
+			<label index="tt_content.list_type_pi1">Energie Formel</label>
 		</languageKey>
 	</data>
 </T3locallang>
