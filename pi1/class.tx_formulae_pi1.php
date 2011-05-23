@@ -239,7 +239,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 		$this->errors = ($errors) ? true : false;
 		
 		$form = '<form action="index.php?id='.$GLOBALS["TSFE"]->id.'" method="post" class="yform">';
-		$form .= '<fieldset>';
+		//$form .= '<fieldset>';
 
 		// adding formula
 		$form .= '
@@ -284,18 +284,6 @@ class tx_formulae_pi1 extends tslib_pibase {
 				<input id="email" name="email" type="text" value="'.$this->isValue('email').'" />
 			</div>
 			<div class="type-check check-left '.$this->isError('gtc').'">
-				<p><strong>Datenschutzbestimmungen</strong></p>
-				<p class="small">Der Anbieter weist ausdrücklich darauf hin, dass die Datenübertragung im Internet
-				(z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen und nicht lückenlos
-				vor dem Zugriff durch Dritte geschützt werden kann. Ihre persönlichen Daten werden ausschließlich für die
-				Teilnahme am Energie-Formel-Voting erhoben und für die Benachrichtigung des Gewinners
-				benutzt.<br />
-				Die Daten werden weder für Werbezwecke genutzt, noch erfolgt eine
-				Weitergabe an Dritte. Ihre Einwilligung zu dieser Speicherung können Sie jederzeit für die Zukunft
-				widerrufen, so dass Ihre vollständigen Daten bei uns gelöscht werden. Bitte wenden Sie sich dafür an
-				info@ich-bin-die-energie.de.<br />
-				Unter den Teilnehmern entscheidet das Los. Der Rechtsweg ist ausgeschlossen.
-				Eine Barauszahlung des Gewinns ist nicht möglich.</p>
 				<div class="subcolumns">
 					<div class="c60l">
 						<div class="subcl">
@@ -318,6 +306,22 @@ class tx_formulae_pi1 extends tslib_pibase {
 				<input type="submit" class="submit" value="Energie-Formel eintragen"/>
 			</div>';
 		$form .= '</form>';
+			
+		// adding Datenschutzbestimmungen
+		$form .= '
+			<p><strong>Datenschutzbestimmungen</strong></p>
+			<p class="small">Der Anbieter weist ausdrücklich darauf hin, dass die Datenübertragung im Internet
+			(z.B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen und nicht lückenlos
+			vor dem Zugriff durch Dritte geschützt werden kann. Ihre persönlichen Daten werden ausschließlich für die
+			Teilnahme am Energie-Formel-Voting erhoben und für die Benachrichtigung des Gewinners
+			benutzt.<br />
+			Die Daten werden weder für Werbezwecke genutzt, noch erfolgt eine
+			Weitergabe an Dritte. Ihre Einwilligung zu dieser Speicherung können Sie jederzeit für die Zukunft
+			widerrufen, so dass Ihre vollständigen Daten bei uns gelöscht werden. Bitte wenden Sie sich dafür an
+			info@ich-bin-die-energie.de.<br />
+			Unter den Teilnehmern entscheidet das Los. Der Rechtsweg ist ausgeschlossen.
+			Eine Barauszahlung des Gewinns ist nicht möglich.</p>
+		';
 			
 		return $form;
 	}
