@@ -244,7 +244,7 @@ class tx_formulae_pi1 extends tslib_pibase {
 		// adding formula
 		$form .= '
 			<div class="'.$this->isError('formula').'">
-				<textarea id="formula" name="formula" cols="30" rows="3">'.$this->isValue('formula').'</textarea>
+				<textarea id="formula" name="formula" cols="30" rows="2">'.$this->isValue('formula').'</textarea>
 			</div>';
 		
 		// adding contact informations
@@ -296,7 +296,18 @@ class tx_formulae_pi1 extends tslib_pibase {
 				info@ich-bin-die-energie.de.<br />
 				Unter den Teilnehmern entscheidet das Los. Der Rechtsweg ist ausgeschlossen.
 				Eine Barauszahlung des Gewinns ist nicht möglich.</p>
-				<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/> <label for="gtc">* Ich stimme den Datenschutzbestimmungen zu.</label>
+				<div class="subcolumns">
+					<div class="c60l">
+						<div class="subcl">
+							<input id="gtc" name="gtc" type="checkbox" value="1" '.$this->isChecked('gtc', 1).'/> <label for="gtc">* Ich stimme den Datenschutzbestimmungen zu.</label>
+						</div>
+					</div>
+					<div class="c40r">
+						<div class="subcr">
+							<p>Alle Felder mit einem * sind Pflichtfelder.</p>
+						</div>
+					</div>
+				</div>
 			</div>
 		';
 		$form .= '</fieldset>';
@@ -304,7 +315,6 @@ class tx_formulae_pi1 extends tslib_pibase {
 		// adding submit button
 		$form .= '
 			<div class="type-button">
-				<p>Alle Felder mit einem * sind Pflichtfelder.</p>
 				<input type="submit" class="submit" value="Energie-Formel eintragen"/>
 			</div>';
 		$form .= '</form>';
